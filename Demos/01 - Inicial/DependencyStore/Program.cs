@@ -1,18 +1,15 @@
-using DependencyStore.Repositories;
-using DependencyStore.Services;
-using DependencyStore.Repositories.Contracts;
-using DependencyStore.Services.Contracts;
-using Microsoft.Data.SqlClient;
+using DependencyStore;
+using DependencyStore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
-builder.Services.AddScoped(x => 
-    new SqlConnection("CONN_STRING"));
+builder.Services.AddSingleton<Configuration>();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
-builder.Services.AddTransient<IPromoCodeRepository, PromoCodeRepository>();
-builder.Services.AddTransient<IDeliveryFeeService, DeliveryFeeService>();
+builder.Services.AddSqlConnection(connectionString);
+builder.Services.AddRepositories();
+builder.Services.AddServices();
 
 var app = builder.Build();
 
